@@ -1,0 +1,52 @@
+@import play.api.libs.json.JsValue
+@(js: JsValue)(content: Html)
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Audio Playground</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+        <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+
+      var rawData = @Html(js.toString)
+
+      // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+          // Create the data table.
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Sample');
+          data.addColumn('number', 'Amplitude');
+          var rowData = [];
+          rawData.dataChunk.data.forEach(function(v,k) {
+              rowData.push([k,v]);
+          })
+          data.addRows(rowData);
+
+          // Set chart options
+          var options = {'title':'Wav',
+              'width':1000,
+              'height':300};
+
+          // Instantiate and draw our chart, passing in some options.
+          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          chart.draw(data, options);
+      }
+    </script>
+    </head>
+    <body>
+        @content
+    </body>
+</html>
